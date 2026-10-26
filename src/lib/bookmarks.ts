@@ -43,6 +43,19 @@ export function removeBookmark(list: readonly Bookmark[], id: string): Bookmark[
   return list.filter((bookmark) => bookmark.id !== id);
 }
 
+/** Relative age such as "just now" or "3 days ago". Returns '' when `addedAt` is not a date. */
+export function formatRelativeTime(addedAt: string, now = new Date()): string {
+  const then = Date.parse(addedAt);
+  if (Number.isNaN(then)) return '';
+  const minutes = Math.floor((now.getTime() - then) / 60_000);
+  if (minutes < 1) return 'just now';
+  const plural = (count: number, unit: string) => `${count} ${unit}${count === 1 ? '' : 's'} ago`;
+  if (minutes < 60) return plural(minutes, 'minute');
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return plural(hours, 'hour');
+  return plural(Math.floor(hours / 24), 'day');
+}
+
 /** Newest first. */
 export function sortBookmarks(list: readonly Bookmark[]): Bookmark[] {
   return [...list].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
