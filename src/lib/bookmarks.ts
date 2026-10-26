@@ -43,6 +43,13 @@ export function removeBookmark(list: readonly Bookmark[], id: string): Bookmark[
   return list.filter((bookmark) => bookmark.id !== id);
 }
 
+/** Case-insensitive match on title or full URL; the query is trimmed. Returns a new list. */
+export function filterBookmarks(list: readonly Bookmark[], query: string): Bookmark[] {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return [...list];
+  return list.filter((b) => b.title.toLowerCase().includes(needle) || b.url.toLowerCase().includes(needle));
+}
+
 /** Newest first. */
 export function sortBookmarks(list: readonly Bookmark[]): Bookmark[] {
   return [...list].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
