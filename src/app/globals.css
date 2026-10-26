@@ -30,9 +30,17 @@ body {
   font-size: 28px;
 }
 
+.page-header {
+  margin-bottom: 24px;
+}
+
 .page-header p {
-  margin: 4px 0 24px;
+  margin: 4px 0 0;
   color: var(--muted);
+}
+
+.page-header .count {
+  font-size: 14px;
 }
 
 .add-form {
@@ -106,7 +114,43 @@ body {
   cursor: pointer;
 }
 
+.count {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.edit-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.edit-form input,
+.edit-form button {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.item .edit-form button {
+  font-size: inherit;
+  color: var(--text);
+}
+
 @media (max-width: 480px) {
+  .edit-form {
+    grid-template-columns: 1fr;
+  }
+
   .add-form {
     grid-template-columns: 1fr;
   }
