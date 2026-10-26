@@ -1,8 +1,17 @@
 {
   "baseBranch": "main",
-  "autonomy": { "mode": "gated" },
-  "limits": { "bounces": 2, "prototypeRounds": 3, "unitTimeoutMinutes": 30 },
+  "autonomy": {
+    "mode": "gated"
+  },
+  "limits": {
+    "bounces": 2,
+    "prototypeRounds": 3,
+    "unitTimeoutMinutes": 30
+  },
   "gate": "pnpm typecheck && pnpm test",
   "probe": null,
-  "deliver": { "pr": false }
+  "deliver": {
+    "pr": true,
+    "remote": "origin"
+  }
 }
