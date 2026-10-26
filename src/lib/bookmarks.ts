@@ -43,6 +43,20 @@ export function removeBookmark(list: readonly Bookmark[], id: string): Bookmark[
   return list.filter((bookmark) => bookmark.id !== id);
 }
 
+/** Puts a removed bookmark back (same record, same `addedAt`). Refuses when its URL is already in the list. */
+export function restoreBookmark(list: readonly Bookmark[], removed: Bookmark): Bookmark[] {
+  const wanted = normalizeUrl(removed.url);
+  const duplicate = list.some((bookmark) => {
+    try {
+      return normalizeUrl(bookmark.url) === wanted;
+    } catch {
+      return false;
+    }
+  });
+  if (duplicate) throw new BookmarkError('that URL is already in the list');
+  return sortBookmarks([removed, ...list]);
+}
+
 /** Newest first. */
 export function sortBookmarks(list: readonly Bookmark[]): Bookmark[] {
   return [...list].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
