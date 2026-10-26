@@ -61,19 +61,19 @@ export function BookmarkList() {
       {visible.length === 0 && trimmedQuery ? (
         <p className="no-match">No bookmarks match &quot;{trimmedQuery}&quot;</p>
       ) : (
-      <ul className="list" data-testid="bookmark-list">
-        {visible.map((bookmark) => (
-          <li key={bookmark.id} className="item" data-testid="bookmark-item">
-            <a href={bookmark.url} target="_blank" rel="noreferrer">
-              <span className="item-title">{bookmark.title}</span>
-              <span className="item-url">{new URL(bookmark.url).hostname}</span>
-            </a>
-            <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => save(removeBookmark(bookmarks, bookmark.id))}>
-              ×
-            </button>
-          </li>
-        ))}
-      </ul>
+        <ul className="list" data-testid="bookmark-list">
+          {visible.map((bookmark) => (
+            <li key={bookmark.id} className="item" data-testid="bookmark-item">
+              <a href={bookmark.url} target="_blank" rel="noreferrer">
+                <span className="item-title">{bookmark.title}</span>
+                <span className="item-url">{new URL(bookmark.url).hostname}</span>
+              </a>
+              <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => save(removeBookmark(bookmarks, bookmark.id))}>
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );
