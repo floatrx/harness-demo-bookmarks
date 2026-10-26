@@ -43,6 +43,24 @@ export function removeBookmark(list: readonly Bookmark[], id: string): Bookmark[
   return list.filter((bookmark) => bookmark.id !== id);
 }
 
+/** Returns a new list with the bookmark's title and URL replaced. The input list is never changed. */
+export function updateBookmark(list: readonly Bookmark[], id: string, input: NewBookmark): Bookmark[] {
+  const old = list.find((bookmark) => bookmark.id === id);
+  if (!old) throw new BookmarkError('bookmark not found');
+  const url = normalizeUrl(input.url);
+  const duplicate = list.some((bookmark) => {
+    if (bookmark.id === id) return false;
+    try {
+      return normalizeUrl(bookmark.url) === url;
+    } catch {
+      return false;
+    }
+  });
+  if (duplicate) throw new BookmarkError('that URL is already saved');
+  const title = input.title.trim() || new URL(url).hostname;
+  return list.map((bookmark) => (bookmark.id === id ? { ...old, title, url } : bookmark));
+}
+
 /** Newest first. */
 export function sortBookmarks(list: readonly Bookmark[]): Bookmark[] {
   return [...list].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
