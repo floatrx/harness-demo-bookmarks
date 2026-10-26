@@ -1,0 +1,11 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.harness/trace/
+.harness/artifacts/
+.harness/tasks/
+.harness/JOURNAL.md
