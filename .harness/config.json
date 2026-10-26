@@ -13,5 +13,9 @@
   "deliver": {
     "pr": true,
     "remote": "origin"
+  },
+  "app": {
+    "start": "pnpm exec next dev -p {port}",
+    "ready": "/"
   }
 }
