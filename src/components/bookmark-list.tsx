@@ -1,7 +1,7 @@
 'use client';
 
 import { type FormEvent, useEffect, useState } from 'react';
-import { type Bookmark, BookmarkError, addBookmark, removeBookmark, sortBookmarks } from '@/lib/bookmarks';
+import { type Bookmark, BookmarkError, addBookmark, formatRelativeTime, removeBookmark, sortBookmarks } from '@/lib/bookmarks';
 import { SEED } from '@/lib/seed';
 
 const STORAGE_KEY = 'bookmarks:v1';
@@ -11,14 +11,18 @@ export function BookmarkList() {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // Null until mounted, so the server HTML and the first client render match (no label).
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (saved) setBookmarks(JSON.parse(saved) as Bookmark[]);
+    setNow(new Date());
   }, []);
 
   const save = (next: Bookmark[]) => {
     setBookmarks(next);
+    setNow(new Date());
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   };
 
@@ -47,17 +51,21 @@ export function BookmarkList() {
         </p>
       )}
       <ul className="list" data-testid="bookmark-list">
-        {sortBookmarks(bookmarks).map((bookmark) => (
+        {sortBookmarks(bookmarks).map((bookmark) => {
+          const label = now ? formatRelativeTime(bookmark.addedAt, now) : '';
+          return (
           <li key={bookmark.id} className="item" data-testid="bookmark-item">
             <a href={bookmark.url} target="_blank" rel="noreferrer">
               <span className="item-title">{bookmark.title}</span>
               <span className="item-url">{new URL(bookmark.url).hostname}</span>
+              {label && <span className="item-time">{label}</span>}
             </a>
             <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => save(removeBookmark(bookmarks, bookmark.id))}>
               ×
             </button>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );
