@@ -65,6 +65,7 @@ export function BookmarkList() {
       <header className="page-header">
         <h1>Bookmarks</h1>
         <p>Save a link, find it later.</p>
+        {loaded && <p className="count">{bookmarks.length === 1 ? '1 bookmark' : `${bookmarks.length} bookmarks`}</p>}
       </header>
       <form className="add-form" onSubmit={onSubmit} data-testid="add-form">
         <input aria-label="URL" placeholder="https://…" value={url} onChange={(event) => setUrl(event.target.value)} required />
@@ -76,7 +77,6 @@ export function BookmarkList() {
           {error}
         </p>
       )}
-      <p className="count">{bookmarks.length === 1 ? '1 bookmark' : `${bookmarks.length} bookmarks`}</p>
       {loaded && bookmarks.length === 0 && <p className="empty">No bookmarks yet. Add your first link above.</p>}
       <ul className="list" data-testid="bookmark-list">
         {sortBookmarks(bookmarks).map((bookmark) => (
@@ -86,7 +86,10 @@ export function BookmarkList() {
                 <input aria-label="Title" value={editTitle} onChange={(event) => setEditTitle(event.target.value)} />
                 <input aria-label="URL" value={editUrl} onChange={(event) => setEditUrl(event.target.value)} required />
                 <button type="submit">Save</button>
-                <button type="button" onClick={() => setEditingId(null)}>
+                <button type="button" onClick={() => {
+                    setEditingId(null);
+                    setEditError(null);
+                  }}>
                   Cancel
                 </button>
                 {editError && (
