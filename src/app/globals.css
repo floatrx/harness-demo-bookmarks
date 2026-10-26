@@ -61,6 +61,22 @@ body {
   color: #b42318;
 }
 
+.search {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 16px 0 0;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.no-match {
+  margin: 16px 0 0;
+  color: var(--muted);
+}
+
 .list {
   list-style: none;
   margin: 16px 0 0;

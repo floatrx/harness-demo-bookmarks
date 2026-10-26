@@ -1,7 +1,7 @@
 'use client';
 
 import { type FormEvent, useEffect, useState } from 'react';
-import { type Bookmark, BookmarkError, addBookmark, removeBookmark, sortBookmarks } from '@/lib/bookmarks';
+import { type Bookmark, BookmarkError, addBookmark, filterBookmarks, removeBookmark, sortBookmarks } from '@/lib/bookmarks';
 import { SEED } from '@/lib/seed';
 
 const STORAGE_KEY = 'bookmarks:v1';
@@ -11,6 +11,7 @@ export function BookmarkList() {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -34,6 +35,9 @@ export function BookmarkList() {
     }
   };
 
+  const trimmedQuery = query.trim();
+  const visible = sortBookmarks(filterBookmarks(bookmarks, query));
+
   return (
     <section className="bookmarks">
       <form className="add-form" onSubmit={onSubmit} data-testid="add-form">
@@ -46,19 +50,31 @@ export function BookmarkList() {
           {error}
         </p>
       )}
-      <ul className="list" data-testid="bookmark-list">
-        {sortBookmarks(bookmarks).map((bookmark) => (
-          <li key={bookmark.id} className="item" data-testid="bookmark-item">
-            <a href={bookmark.url} target="_blank" rel="noreferrer">
-              <span className="item-title">{bookmark.title}</span>
-              <span className="item-url">{new URL(bookmark.url).hostname}</span>
-            </a>
-            <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => save(removeBookmark(bookmarks, bookmark.id))}>
-              ×
-            </button>
-          </li>
-        ))}
-      </ul>
+      <input
+        type="search"
+        className="search"
+        aria-label="Search"
+        placeholder="Search"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      {visible.length === 0 && trimmedQuery ? (
+        <p className="no-match">No bookmarks match &quot;{trimmedQuery}&quot;</p>
+      ) : (
+        <ul className="list" data-testid="bookmark-list">
+          {visible.map((bookmark) => (
+            <li key={bookmark.id} className="item" data-testid="bookmark-item">
+              <a href={bookmark.url} target="_blank" rel="noreferrer">
+                <span className="item-title">{bookmark.title}</span>
+                <span className="item-url">{new URL(bookmark.url).hostname}</span>
+              </a>
+              <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => save(removeBookmark(bookmarks, bookmark.id))}>
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
