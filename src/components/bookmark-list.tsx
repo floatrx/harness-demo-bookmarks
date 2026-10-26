@@ -1,16 +1,19 @@
 'use client';
 
-import { type FormEvent, useEffect, useState } from 'react';
-import { type Bookmark, BookmarkError, addBookmark, removeBookmark, sortBookmarks } from '@/lib/bookmarks';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { type Bookmark, BookmarkError, addBookmark, removeBookmark, restoreBookmark, sortBookmarks } from '@/lib/bookmarks';
 import { SEED } from '@/lib/seed';
 
 const STORAGE_KEY = 'bookmarks:v1';
+const TOAST_MS = 5000;
 
 export function BookmarkList() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(SEED);
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [removed, setRemoved] = useState<Bookmark | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -20,6 +23,35 @@ export function BookmarkList() {
   const save = (next: Bookmark[]) => {
     setBookmarks(next);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const clearTimer = () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  };
+
+  useEffect(() => clearTimer, []);
+
+  const onRemove = (bookmark: Bookmark) => {
+    save(removeBookmark(bookmarks, bookmark.id));
+    clearTimer();
+    setRemoved(bookmark);
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      setRemoved(null);
+    }, TOAST_MS);
+  };
+
+  const onUndo = () => {
+    if (!removed) return;
+    try {
+      save(restoreBookmark(bookmarks, removed));
+      setError(null);
+      clearTimer();
+      setRemoved(null);
+    } catch (caught) {
+      setError(caught instanceof BookmarkError ? caught.message : 'could not restore the bookmark');
+    }
   };
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -53,12 +85,22 @@ export function BookmarkList() {
               <span className="item-title">{bookmark.title}</span>
               <span className="item-url">{new URL(bookmark.url).hostname}</span>
             </a>
-            <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => save(removeBookmark(bookmarks, bookmark.id))}>
+            <button type="button" aria-label={`Remove ${bookmark.title}`} onClick={() => onRemove(bookmark)}>
               ×
             </button>
           </li>
         ))}
       </ul>
+      <div role="status" className={removed ? 'toast' : undefined}>
+        {removed && (
+          <>
+            <span>Bookmark removed</span>
+            <button type="button" onClick={onUndo}>
+              Undo
+            </button>
+          </>
+        )}
+      </div>
     </section>
   );
 }
